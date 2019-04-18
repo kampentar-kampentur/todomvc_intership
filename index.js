@@ -1,4 +1,3 @@
-
 var view = {
   todoList: document.querySelector('.todo-list'),
   todoInput: document.querySelector('.new-todo'),
