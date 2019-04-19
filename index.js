@@ -7,7 +7,7 @@ var view = {
   showTodoCount: function (count) {
     this.todoCount.innerHTML = '<strong>' + count + '</strong> items left';
   },
-  showTodo: function (newLi) {
+  showTodoList: function (newLi) {
     this.todoList.appendChild(newLi);
   },
   hideElement: function (elem) {
@@ -25,6 +25,13 @@ var model = {
     newLi.setAttribute('data-id', dataId);
     newLi.innerHTML = '<div class="view"><input class="toggle" type="checkbox" /><label>' + msg + '</label><button class="destroy"></button></div>';
     return newLi;
+  },
+  bufTodoList: document.createElement('ul'),
+  addTodo: function (newLi) {
+    this.bufTodoList.appendChild(newLi);
+  },
+  removeElement: function (elem) {
+    elem.parentNode.removeChild(elem);
   }
 }
 
@@ -34,21 +41,27 @@ var controller = {
     if (view.todoInput.value) {
       var newLi = model.creatTodo(view.todoInput.value, controller.counter);
       controller.counter++;
-      view.showTodo(newLi);
-      view.showTodoCount(view.todoList.children.length);
+      model.addTodo(newLi);
+      view.showTodoCount(model.bufTodoList.children.length);
       view.todoInput.value = '';
+      newLi.querySelector('.destroy').addEventListener('click', () => {
+        model.removeElement(newLi);
+        this.emptyTodoList();
+        view.showTodoCount(model.bufTodoList.children.length);
+      });
       this.emptyTodoList();
     }
   },
   emptyTodoList: function () {
-    if (!view.todoList.children.length) {
+    if (!model.bufTodoList.children.length) {
       view.hideElement(view.todoFooter);
-      view.hideElement(view.todoList);
+      view.hideElement(view.todoMain);
     } else {
       view.showElement(view.todoFooter);
-      view.showElement(view.todoList);
+      view.showElement(view.todoMain);
     }
-  }
+  },
+
 }
 
 view.todoInput.onkeydown = function (e) {
