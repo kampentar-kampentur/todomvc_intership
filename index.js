@@ -1,9 +1,11 @@
 var view = {
+  // обращение к элементам
   todoList: document.querySelector('.todo-list'),
   todoInput: document.querySelector('.new-todo'),
   todoCount: document.querySelector('.todo-count'),
   todoMain: document.querySelector('.main'),
   todoFooter: document.querySelector('.footer'),
+  // отображение элементов
   showTodoCount: function (count) {
     this.todoCount.innerHTML = '<strong>' + count + '</strong> items left';
   },
@@ -19,6 +21,7 @@ var view = {
 };
 
 var model = {
+  // создание новой тудухи
   creatTodo: function (msg, dataId) {
     dataId = dataId || 1;
     var newLi = document.createElement('li');
@@ -26,7 +29,9 @@ var model = {
     newLi.innerHTML = '<div class="view"><input class="toggle" type="checkbox" /><label>' + msg + '</label><button class="destroy"></button></div>';
     return newLi;
   },
+  // хранение листа тудух
   bufTodoList: document.createElement('ul'),
+  // взаимодействие буфером
   addTodo: function (newLi) {
     this.bufTodoList.appendChild(newLi);
   },
@@ -36,7 +41,9 @@ var model = {
 }
 
 var controller = {
+  // генератор ID
   counter: 1,
+  // добавление тудухи
   addNewTodo: function () {
     if (view.todoInput.value) {
       var newLi = model.creatTodo(view.todoInput.value, controller.counter);
@@ -52,6 +59,7 @@ var controller = {
       this.emptyTodoList();
     }
   },
+  // проверка на пустой лист
   emptyTodoList: function () {
     if (!model.bufTodoList.children.length) {
       view.hideElement(view.todoFooter);
@@ -63,13 +71,13 @@ var controller = {
   },
 
 }
-
+// обработка нажития Enter
 view.todoInput.onkeydown = function (e) {
   if (event.keyCode == 13) {
     controller.addNewTodo()
   }
 }
-
+// проверка на наличие тудух при загрузке
 document.addEventListener("DOMContentLoaded", function (event) {
   controller.emptyTodoList();
 });
