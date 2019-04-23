@@ -6,6 +6,7 @@ var view = {
   todoMain: document.querySelector('.main'),
   todoFooter: document.querySelector('.footer'),
   todoFiltres: document.querySelector('.filters'),
+  buttonToggleAll: document.querySelector('#toggle-all'),
   // отображение элементов
   showTodoCount: function (count) {
     this.todoCount.innerHTML = '<strong>' + count + '</strong> items left';
@@ -54,6 +55,16 @@ var model = {
       }
     }
     return arrId;
+  },
+  makeAllCheked: function (bul) {
+    for (var i = 0; i < model.bufTodoAllList.children.length; i++) {
+      model.bufTodoAllList.children[i].querySelector('.toggle').checked = bul;
+      if (bul) {
+        model.bufTodoAllList.children[i].querySelector('.toggle').className = 'completed';
+      } else {
+        model.bufTodoAllList.children[i].querySelector('.toggle').className = '';
+      }
+    }
   }
 }
 
@@ -96,6 +107,11 @@ var controller = {
     }
   },
   refreshTodoList: function (selectFilter) {
+    if (model.bufTodoAllList.children.length === model.filerChecked(true).length) {
+      view.buttonToggleAll.checked = true;
+    } else {
+      view.buttonToggleAll.checked = false;
+    }
     var newUl = document.createElement('ul');
     switch (selectFilter) {
       case 0:
@@ -143,19 +159,22 @@ view.todoFiltres.addEventListener('click', (e) => {
   if (e.target.tagName === 'A') {
     view.todoFiltres.querySelector('.selected').className = '';
     e.target.className = 'selected';
-    switch (e.target.innerHTML) {
-      case 'All':
+    switch (e.target.getAttribute('href')) {
+      case '#/':
         model.selectFilter = 0;
         break;
-      case 'Active':
+      case '#/active':
         model.selectFilter = 1;
         break;
-      case 'Completed':
+      case '#/completed':
         model.selectFilter = 2;
         break;
     }
     controller.refreshTodoList(model.selectFilter);
   }
+});
+view.buttonToggleAll.addEventListener('click', (e) => {
+  // if (model.bufTodoActiveList.length = )
 });
 // обработка нажития Enter
 view.todoInput.onkeydown = function (e) {
