@@ -37,11 +37,13 @@ var view = {
   },
   makeCheked: function (boolean, id) {
     let todo = view.todoList.querySelector('li[data-id="' + id + '"]')
-    todo.querySelector('.toggle').checked = boolean;
-    if (boolean) {
-      todo.className = 'completed';
-    } else {
-      todo.className = '';
+    if (todo) {
+      todo.querySelector('.toggle').checked = boolean;
+      if (boolean) {
+        todo.className = 'completed';
+      } else {
+        todo.className = '';
+      }
     }
   },
   removeElement: function (elem) {
@@ -55,10 +57,6 @@ var model = {
   // хранение листа тудух
   bufTodoAllList: document.createElement('ul'),
   bufTodoList: [],
-  // взаимодействие буфером
-  // addTodo: function (newLi) {
-  //   this.bufTodoAllList.appendChild(newLi);
-  // },
   creatNewTodo: function (id, value, checked) {
     checked = checked || false;
     return { 'id': id, 'value': value, 'checked': checked };
@@ -77,8 +75,6 @@ var model = {
 };
 
 var controller = {
-  // генератор ID
-  counter: 1,
   // добавление тудухи
   addNewTodo: function () {
     if (view.todoInput.value) {
@@ -129,12 +125,14 @@ var controller = {
     }
   },
   switchFilter: function (selectFilter) {
+    view.todoFiltres.querySelector('.selected').className = '';
     switch (selectFilter) {
       case 0:
         view.todoList.innerHTML = '';
         for (let i = 0; i < model.bufTodoList.length; i++) {
           view.showNewTodo(view.creatNewTodo(model.bufTodoList[i]));
         }
+        view.todoFiltres.querySelector('a[href="#/"]').className = 'selected';
         break;
       case 1:
         let listNotCheked = model.bufTodoList.filter(obj => !obj.checked);
@@ -142,6 +140,7 @@ var controller = {
         for (let i = 0; i < listNotCheked.length; i++) {
           view.showNewTodo(view.creatNewTodo(listNotCheked[i]));
         }
+        view.todoFiltres.querySelector('a[href="#/active"]').className = 'selected';
         break;
       case 2:
         let listCheked = model.bufTodoList.filter(obj => obj.checked);
@@ -149,6 +148,7 @@ var controller = {
         for (let i = 0; i < listCheked.length; i++) {
           view.showNewTodo(view.creatNewTodo(listCheked[i]));
         }
+        view.todoFiltres.querySelector('a[href="#/completed"]').className = 'selected';
         break;
     }
   },
@@ -201,12 +201,13 @@ var controller = {
     controller.emptyTodoList();
     controller.displayClearCompletedButton();
     view.showTodoCount(checked.length);
+    controller.setStorage();
   },
   choiceFiltres: function (e) {
-    if (e.target.tagName === 'A' && e.target.className !== 'selected') {
-      view.todoFiltres.querySelector('.selected').className = '';
-      e.target.className = 'selected';
-      switch (e.target.getAttribute('href')) {
+    setTimeout(() => {
+      let href = location.href;
+      let anchor = href.slice(href.lastIndexOf('#'))
+      switch (anchor) {
         case '#/':
           model.selectFilter = 0;
           break;
@@ -218,43 +219,52 @@ var controller = {
           break;
       }
       controller.switchFilter(model.selectFilter);
-    }
+      controller.setStorage();
+    }, 0);
+
   },
   toggleAll: function (e) {
     controller.makeAllCheked(view.buttonToggleAll.checked);
     controller.displayClearCompletedButton();
+    controller.switchFilter(model.selectFilter);
     view.showTodoCount(model.getCheckedId(false).length);
+    controller.setStorage();
   },
   clearCompleted: function (e) {
     var arrChekedId = model.getCheckedId(true);
     for (let i = 0; i < arrChekedId.length; i++) {
-      view.removeElement(view.todoList.querySelector('li[data-id="' + arrChekedId[i] + '"]'));
+      if (model.selectFilter != 1) {
+        view.removeElement(view.todoList.querySelector('li[data-id="' + arrChekedId[i] + '"]'));
+      }
       model.bufTodoList.splice(controller.getIndexById(arrChekedId[i]), 1);
     }
     controller.emptyTodoList();
+    controller.setStorage();
   },
   addTodo: function (e) {
     controller.addNewTodo();
     controller.emptyTodoList();
     view.showTodoCount(model.getCheckedId(false).length);
     view.buttonToggleAll.checked = false;
+    controller.setStorage();
   },
   editingTodo: function (e) {
     if (e.target.tagName === 'LABEL') {
       var id = e.target.parentNode.parentNode.getAttribute('data-id');
+      var todo = e.target.parentNode.parentNode;
       var index = controller.getIndexById(id);
       let newInput = document.createElement('input')
       newInput.className = 'edit';
       newInput.value = model.bufTodoList[index].value;
-      view.todoList.children[index].className = 'editing';
-      view.todoList.children[index].appendChild(newInput);
-      var inp = view.todoList.children[index].querySelector('.edit');
+      todo.className = 'editing';
+      todo.appendChild(newInput);
+      var inp = todo.querySelector('.edit');
       inp.focus();
       inp.addEventListener('blur', (e) => {
         if (inp.value) {
           model.bufTodoList[index].value = inp.value;
-          view.todoList.insertBefore(view.creatNewTodo(model.bufTodoList[index]), view.todoList.children[index]);
-          view.removeElement(view.todoList.children[index + 1]);
+          view.todoList.insertBefore(view.creatNewTodo(model.bufTodoList[index]), todo);
+          view.removeElement(view.todoList.querySelector('.editing'));
         } else {
           var count = model.getCheckedId(false).length;
           if (model.bufTodoList[index].checked) {
@@ -266,10 +276,23 @@ var controller = {
             view.hideElement(view.todoFooter);
             view.hideElement(view.todoMain);
           }
-          view.removeElement(view.todoList.children[index]);
+          view.removeElement(todo);
           model.bufTodoList.splice(index, 1);
         }
+        controller.setStorage();
       });
+    }
+  },
+  setStorage: function () {
+    localStorage.setItem('todoList', JSON.stringify(model.bufTodoList));
+    localStorage.setItem('lastId', model.counter);
+  },
+  getStorage: function () {
+    if (localStorage.getItem('todoList') !== null) {
+      model.bufTodoList = JSON.parse(localStorage.getItem('todoList'));
+    }
+    if (localStorage.getItem('lastId') !== null) {
+      model.counter = parseInt(localStorage.getItem('lastId'));
     }
   }
 };
@@ -278,7 +301,11 @@ view.todoList.addEventListener('click', controller.clickButtonTodoList);
 view.todoList.addEventListener('dblclick', controller.editingTodo)
 
 // смена фильтров
-view.todoFiltres.addEventListener('click', controller.choiceFiltres);
+view.todoFiltres.addEventListener('click', (e) => {
+  if (e.target.tagName === 'A' && e.target.className !== 'selected') {
+    controller.choiceFiltres();
+  }
+});
 
 // масовая обработка
 view.buttonToggleAll.addEventListener('click', controller.toggleAll);
@@ -295,6 +322,10 @@ view.todoInput.addEventListener('blur', controller.addTodo);
 
 // проверка на наличие тудух при загрузке
 document.addEventListener("DOMContentLoaded", function (event) {
+  controller.getStorage();
+  controller.choiceFiltres();
+  view.showTodoCount(model.getCheckedId(false).length);
   controller.displayClearCompletedButton();
   controller.emptyTodoList();
+  console.log(location.href)
 });
