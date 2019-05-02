@@ -281,6 +281,11 @@ var controller = {
         }
         controller.setStorage();
       });
+      inp.addEventListener('keydown', (e) => {
+        if (e.key == 'Enter') {
+          inp.blur();
+        }
+      });
     }
   },
   setStorage: function () {
