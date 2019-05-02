@@ -240,6 +240,7 @@ var controller = {
     }
     controller.emptyTodoList();
     controller.setStorage();
+    controller.displayClearCompletedButton();
   },
   addTodo: function (e) {
     controller.addNewTodo();
@@ -332,5 +333,4 @@ document.addEventListener("DOMContentLoaded", function (event) {
   view.showTodoCount(model.getCheckedId(false).length);
   controller.displayClearCompletedButton();
   controller.emptyTodoList();
-  console.log(location.href)
 });
