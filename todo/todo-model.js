@@ -81,9 +81,7 @@ class TodoListModel {
   }
 
   setTodoId() {
-    let newId = '_' + Math.random().toString(36).substr(2, 9);
-    if (typeof this.todoList.find(e => e.id == newId) != 'undefined') newId = this.setTodoId();
-    return newId;
+    return new Date().getTime();
   }
 
   getIndexById(id) {

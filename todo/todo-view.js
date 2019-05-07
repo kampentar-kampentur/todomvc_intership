@@ -8,7 +8,7 @@ class TodoView {
     this.todoFooter = elem.querySelector('.footer');
     this.todoFiltres = elem.querySelector('.filters');
     this.clearCompletedButton = elem.querySelector('.clear-completed');
-    this.buttonToggleAll = elem.querySelector('#toggle-all');
+    this.buttonToggleAll = elem.querySelector('.toggle-all');
     this.filter = 'all';
   }
 
