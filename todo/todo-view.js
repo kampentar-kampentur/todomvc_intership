@@ -14,7 +14,8 @@ class TodoView {
 
   creatTodoItem(value, id, state = false) {
     let newTodo = document.createElement('li');
-    newTodo.innerHTML = '<div class="view"><input class="toggle" type="checkbox" /><label>' + value + '</label><button class="destroy"></button></div>';
+    newTodo.innerHTML = '<div class="view"><input class="toggle" type="checkbox" /><label></label><button class="destroy"></button></div>';
+    newTodo.querySelector('label').innerText = value;
     newTodo.setAttribute('data-id', id);
     if (state) {
       newTodo.querySelector('.toggle').checked = state;
