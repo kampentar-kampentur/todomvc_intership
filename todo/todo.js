@@ -9,6 +9,8 @@ class TodoApp {
         this.enterTodo(e);
       }
     });
+
+
     this.findingFilterHash();
     this.model.filtrationList();
     this.view.showTodoList(this.model.filteredList);
@@ -23,6 +25,7 @@ class TodoApp {
     this.view.buttonToggleAll.addEventListener('click', this.changeStateToggleAll.bind(this));
     this.view.todoFiltres.addEventListener('click', this.switchFilter.bind(this));
     this.view.todoList.addEventListener('dblclick', this.editingTodo.bind(this));
+
   }
 
   enterTodo(e) {
@@ -36,6 +39,7 @@ class TodoApp {
       this.view.buttonToggleAll.checked = this.model.todoList.every((e) => e.checked);
     }
   }
+
   remuveTodo(e) {
     if (e.target.className !== 'destroy') return;
     let id = this.view.getTodoElementId(e.target);
@@ -48,6 +52,7 @@ class TodoApp {
     this.view.displayClearCompleted(this.model.todoList.length - unchecked.length > 0);
     this.view.buttonToggleAll.checked = this.model.todoList.every((e) => e.checked);
   }
+
   changeTodoState(e) {
     if (e.target.className !== 'toggle') return;
     let id = this.view.getTodoElementId(e.target);
@@ -64,6 +69,7 @@ class TodoApp {
       this.view.displayFooter(this.model.todoList.length);
     }
   }
+
   clearCompleted(e) {
     this.model.clearCompletedItem();
     this.view.showTodoList(this.model.filteredList);
@@ -71,6 +77,7 @@ class TodoApp {
     this.view.displayClearCompleted(false);
     this.view.buttonToggleAll.checked = this.model.todoList.every((e) => e.checked);
   }
+
   changeStateToggleAll(e) {
     if (this.model.filter === 'all') {
       this.model.changeStateAllItem(e.target.checked);
@@ -82,6 +89,7 @@ class TodoApp {
     this.view.showTodoCounter(this.model.todoList.filter(e => !e.checked).length);
     this.view.displayClearCompleted(e.target.checked);
   }
+
   findingFilterHash() {
     switch (window.location.hash) {
       case '#/active':
@@ -97,6 +105,7 @@ class TodoApp {
     this.view.showSelectedFilter(this.filter);
     this.filter = this.model.filter;
   }
+
   editingTodo(e) {
     if (e.target.tagName != 'LABEL') return;
     let id = this.view.getTodoElementId(e.target);
