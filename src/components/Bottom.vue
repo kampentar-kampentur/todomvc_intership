@@ -5,13 +5,13 @@
     </span>
     <ul class="filters">
       <li>
-        <router-link :to="{ name: home, params: { filter: '' } }">All</router-link>
+        <router-link :to="{ name: 'home', params: { filter: '' } }">All</router-link>
       </li>
       <li>
-        <router-link :to="{ name: home, params: { filter: 'active' } }">Active</router-link>
+        <router-link :to="{ name: 'home', params: { filter: 'active' } }">Active</router-link>
       </li>
       <li>
-        <router-link :to="{ name: home, params: { filter: 'completed' } }">Completed</router-link>
+        <router-link :to="{ name: 'home', params: { filter: 'completed' } }">Completed</router-link>
       </li>
     </ul>
     <button class="clear-completed" @click="clearCompleated">Clear completed</button>
